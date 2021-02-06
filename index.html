@@ -1,0 +1,110 @@
+
+<script>
+const errors = {
+  'ReferenceError': {
+    'is not defined': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': 'a'
+    }
+  },
+  'TypeError': {
+    'Cannot read property': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': 'null.a'
+    },
+    'Assignment to constant variable': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': "const a = 1\r\na=2"
+    }
+  },
+  'SyntaxError': {
+    'Invalid or unexpected token': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': "'"
+    },
+    'Unexpected token': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': "="
+    },
+    'Unexpected end of input': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': "{"
+    },
+    'Unexpected number': {
+      'description': "",
+      'hintUrl': "",
+      'exampleCode': "null.1"
+    }
+  }
+}
+
+let currentQuestionErrorType;
+let currentQuestionErrorMessage;
+
+const setQuestion = function () {
+  const errorTypeKeys = Object.keys(errors)
+  currentQuestionErrorType = errorTypeKeys[Math.floor(Math.random() * errorTypeKeys.length)]
+  const errorMessageKeys = Object.keys(errors[currentQuestionErrorType])
+  currentQuestionErrorMessage = errorMessageKeys[Math.floor(Math.random() * errorMessageKeys.length)]
+
+  const questionArea = document.getElementById('question')
+  questionArea.innerText = 'エラーメッセージに "' + currentQuestionErrorMessage + '" を含む ' + currentQuestionErrorType + ' を起こしてみましょう'
+}
+
+const judge = function() {
+  const codeArea = document.getElementById('code')
+  const messageArea = document.getElementById('message')
+  try {
+    eval(codeArea.value)
+  } catch (e) {
+    if(errors[e.name]) {
+      const erroMessageRegex = new RegExp(currentQuestionErrorMessage);
+      if(e.name == currentQuestionErrorType && erroMessageRegex.test(e.message)) {
+        messageArea.innerText = "正解です\n" + e.name + "\n" + e.message
+      } else {
+        messageArea.innerText = "違います\n" + e.name + "\n" + e.message
+      }
+    } else {
+      messageArea.innerText = "まだ登録されてないエラーです\n" + e.name + "\n" + e.message
+      throw e
+    }
+    return
+  }
+  messageArea.innerText = "エラーを起こしてください"
+}
+
+const seeAnswer = function() {
+  const codeArea = document.getElementById('code')
+  codeArea.value = errors[currentQuestionErrorType][currentQuestionErrorMessage].exampleCode
+}
+
+window.onload = function() {
+  const codeArea = document.getElementById('code')
+  const runButton = document.getElementById('run')
+  const nextButton = document.getElementById('next')
+  const answerButton = document.getElementById('answer')
+
+  runButton.addEventListener('click', judge)
+  nextButton.addEventListener('click', setQuestion)
+  answerButton.addEventListener('click', seeAnswer)
+
+  setQuestion()
+}
+ 
+</script>
+
+<body>
+  <div id="question"></div>
+<textarea id=code style="height: 200px; width: 400px">// write your code here...
+</textarea>
+  <button id=run>Run</button>
+  <button id=answer>See Answer</button>
+  <button id=next>Next</button>
+  <div id="message"></div>
+</body>
